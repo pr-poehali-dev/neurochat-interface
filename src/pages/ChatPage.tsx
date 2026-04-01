@@ -13,7 +13,7 @@ const AI_RESPONSES = [
   "Я здесь, чтобы помочь вам! Могу отвечать на вопросы, писать тексты, объяснять сложные темы простыми словами, помогать с кодом и многим другим.",
   "Интересная мысль! Искусственный интеллект развивается стремительно. Каждый год появляются новые архитектуры и возможности, которые открывают новые горизонты для человечества.",
   "Понимаю вас. Давайте разберём это подробнее. Я готов уделить столько времени, сколько вам нужно, чтобы ответить на ваш вопрос максимально полно и понятно.",
-  "Отличная идея! Вот несколько соображений по этому поводу: во-первых, важно учитывать контекст. Во-вторых, стоит рассмотреть разные точки зрения. Это поможет принять взвешенное решение.",
+  "Отличная идея! Вот несколько соображений: во-первых, важно учитывать контекст. Во-вторых, стоит рассмотреть разные точки зрения. Это поможет принять взвешенное решение.",
 ];
 
 export default function ChatPage() {
@@ -124,96 +124,185 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
+      {/* ===== HEADER ===== */}
       <div
-        className="flex items-center justify-between px-6 py-4"
-        style={{ borderBottom: "1px solid hsl(220, 25%, 10%)", background: "hsl(220, 30%, 5%)" }}
+        className="flex items-center justify-between px-5 py-3.5"
+        style={{
+          borderBottom: "1px solid rgba(79,142,247,0.09)",
+          background: "rgba(10,14,28,0.8)",
+          backdropFilter: "blur(20px)",
+        }}
       >
         <div className="flex items-center gap-3">
+          {/* AI Avatar */}
           <div
             className="relative flex items-center justify-center rounded-xl"
-            style={{ width: 40, height: 40, background: "linear-gradient(135deg, #1e40af22, #2563eb33)", border: "1px solid rgba(59,130,246,0.3)" }}
+            style={{
+              width: 40,
+              height: 40,
+              background: "linear-gradient(135deg, #1d4ed8, #4f8ef7)",
+              boxShadow: "0 0 16px rgba(79,142,247,0.35)",
+            }}
           >
-            <Icon name="Bot" size={20} style={{ color: "#60a5fa" }} />
+            <Icon name="Bot" size={19} style={{ color: "white" }} />
             <span
-              className="absolute bottom-0 right-0 rounded-full"
-              style={{ width: 10, height: 10, background: "#22c55e", border: "2px solid hsl(220, 30%, 5%)" }}
+              className="absolute -bottom-0.5 -right-0.5 rounded-full"
+              style={{
+                width: 10,
+                height: 10,
+                background: "#22c55e",
+                border: "2px solid hsl(222, 47%, 4%)",
+                boxShadow: "0 0 6px #22c55e",
+              }}
             />
           </div>
           <div>
-            <p className="font-semibold text-sm" style={{ color: "hsl(210,40%,95%)" }}>NeuralChat ИИ</p>
-            <p className="text-xs" style={{ color: "#22c55e" }}>● Онлайн</p>
+            <p className="font-semibold text-sm" style={{ color: "hsl(210,40%,95%)" }}>
+              NeuralChat
+            </p>
+            <div className="flex items-center gap-1.5">
+              <span
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: "#22c55e", boxShadow: "0 0 4px #22c55e" }}
+              />
+              <p className="text-xs" style={{ color: "#22c55e" }}>
+                Онлайн · GPT-4
+              </p>
+            </div>
           </div>
         </div>
-        <button
-          onClick={clearChat}
-          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200"
-          style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)", color: "#60a5fa" }}
-        >
-          <Icon name="RefreshCw" size={14} />
-          Новый чат
-        </button>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={clearChat}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200"
+            style={{
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: "hsl(215, 20%, 55%)",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background = "rgba(79,142,247,0.08)";
+              (e.currentTarget as HTMLElement).style.borderColor = "rgba(79,142,247,0.2)";
+              (e.currentTarget as HTMLElement).style.color = "#7ab3ff";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)";
+              (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)";
+              (e.currentTarget as HTMLElement).style.color = "hsl(215, 20%, 55%)";
+            }}
+          >
+            <Icon name="RefreshCw" size={13} />
+            Очистить
+          </button>
+        </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-4">
+      {/* ===== MESSAGES ===== */}
+      <div className="flex-1 overflow-y-auto px-5 py-5 flex flex-col gap-5">
         {messages.map((msg, i) => (
           <div
             key={msg.id}
             className="flex animate-fade-in"
-            style={{ justifyContent: msg.role === "user" ? "flex-end" : "flex-start", animationDelay: `${i * 0.05}s` }}
+            style={{
+              justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+              animationDelay: `${i * 0.04}s`,
+            }}
           >
             {msg.role === "ai" && (
               <div
-                className="flex items-center justify-center rounded-xl mr-2 flex-shrink-0"
-                style={{ width: 32, height: 32, background: "linear-gradient(135deg, #2563eb, #1d4ed8)", alignSelf: "flex-end" }}
+                className="flex items-center justify-center rounded-xl mr-2.5 flex-shrink-0"
+                style={{
+                  width: 32,
+                  height: 32,
+                  background: "linear-gradient(135deg, #1d4ed8, #4f8ef7)",
+                  boxShadow: "0 0 10px rgba(79,142,247,0.3)",
+                  alignSelf: "flex-end",
+                  marginBottom: "2px",
+                }}
               >
-                <Icon name="Bot" size={14} />
+                <Icon name="Bot" size={14} style={{ color: "white" }} />
               </div>
             )}
 
-            <div style={{ maxWidth: "70%" }}>
+            <div style={{ maxWidth: "72%" }}>
               <div
                 className={msg.role === "user" ? "chat-bubble-user" : "chat-bubble-ai"}
-                style={{ padding: "12px 16px", fontSize: "14px", lineHeight: 1.6 }}
+                style={{ padding: "12px 16px", fontSize: "14px", lineHeight: 1.65 }}
               >
                 {msg.text}
               </div>
-              <div className="flex items-center gap-2 mt-1" style={{ justifyContent: msg.role === "user" ? "flex-end" : "flex-start" }}>
-                <span className="text-xs" style={{ color: "hsl(215, 20%, 40%)" }}>{msg.time}</span>
+              <div
+                className="flex items-center gap-2 mt-1.5 px-1"
+                style={{
+                  justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                }}
+              >
+                <span
+                  className="text-xs font-mono-ibm"
+                  style={{ color: "hsl(215, 20%, 36%)", fontSize: "10px" }}
+                >
+                  {msg.time}
+                </span>
                 {msg.role === "ai" && (
                   <button
                     onClick={() => speakText(msg.text)}
-                    className="transition-all duration-200 rounded-md p-0.5"
-                    style={{ color: isSpeaking ? "#60a5fa" : "hsl(215, 20%, 40%)" }}
+                    className="p-1 rounded-md transition-all duration-200"
+                    style={{ color: isSpeaking ? "#4f8ef7" : "hsl(215, 20%, 36%)" }}
                     title="Озвучить"
                   >
-                    <Icon name={isSpeaking ? "VolumeX" : "Volume2"} size={12} />
+                    <Icon name={isSpeaking ? "VolumeX" : "Volume2"} size={11} />
                   </button>
                 )}
               </div>
             </div>
+
+            {msg.role === "user" && (
+              <div
+                className="flex items-center justify-center rounded-xl ml-2.5 flex-shrink-0"
+                style={{
+                  width: 32,
+                  height: 32,
+                  background: "linear-gradient(135deg, #374151, #4b5563)",
+                  alignSelf: "flex-end",
+                  marginBottom: "2px",
+                }}
+              >
+                <Icon name="User" size={14} style={{ color: "hsl(215,20%,80%)" }} />
+              </div>
+            )}
           </div>
         ))}
 
         {/* Typing indicator */}
         {isTyping && (
-          <div className="flex items-center gap-2 animate-fade-in">
+          <div className="flex items-center gap-2.5 animate-fade-in">
             <div
-              className="flex items-center justify-center rounded-xl"
-              style={{ width: 32, height: 32, background: "linear-gradient(135deg, #2563eb, #1d4ed8)" }}
+              className="flex items-center justify-center rounded-xl flex-shrink-0"
+              style={{
+                width: 32,
+                height: 32,
+                background: "linear-gradient(135deg, #1d4ed8, #4f8ef7)",
+                alignSelf: "flex-end",
+              }}
             >
-              <Icon name="Bot" size={14} />
+              <Icon name="Bot" size={14} style={{ color: "white" }} />
             </div>
             <div
               className="chat-bubble-ai flex items-center gap-1.5"
               style={{ padding: "14px 18px" }}
             >
-              {[0, 0.2, 0.4].map((delay, i) => (
+              {[0, 0.18, 0.36].map((delay, i) => (
                 <span
                   key={i}
                   className="rounded-full animate-typing"
-                  style={{ width: 7, height: 7, background: "#3b82f6", display: "block", animationDelay: `${delay}s` }}
+                  style={{
+                    width: 7,
+                    height: 7,
+                    background: "#4f8ef7",
+                    display: "block",
+                    animationDelay: `${delay}s`,
+                  }}
                 />
               ))}
             </div>
@@ -223,70 +312,96 @@ export default function ChatPage() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input area */}
+      {/* ===== INPUT AREA ===== */}
       <div
         className="px-4 py-4"
-        style={{ borderTop: "1px solid hsl(220, 25%, 10%)", background: "hsl(220, 30%, 5%)" }}
+        style={{
+          borderTop: "1px solid rgba(79,142,247,0.08)",
+          background: "rgba(10,14,28,0.8)",
+          backdropFilter: "blur(20px)",
+        }}
       >
         <div
-          className="flex items-end gap-3 rounded-2xl p-2"
-          style={{ background: "hsl(220, 28%, 10%)", border: "1px solid hsl(220, 25%, 16%)" }}
+          className="flex items-end gap-3 rounded-2xl px-4 py-3"
+          style={{
+            background: "hsl(222, 38%, 9%)",
+            border: "1px solid rgba(79,142,247,0.15)",
+            boxShadow: "0 0 0 0 rgba(79,142,247,0)",
+            transition: "border-color 0.2s, box-shadow 0.2s",
+          }}
+          onFocusCapture={(e) => {
+            (e.currentTarget as HTMLElement).style.borderColor = "rgba(79,142,247,0.4)";
+            (e.currentTarget as HTMLElement).style.boxShadow = "0 0 0 3px rgba(79,142,247,0.08)";
+          }}
+          onBlurCapture={(e) => {
+            (e.currentTarget as HTMLElement).style.borderColor = "rgba(79,142,247,0.15)";
+            (e.currentTarget as HTMLElement).style.boxShadow = "0 0 0 0 rgba(79,142,247,0)";
+          }}
         >
-          {/* Mic button */}
-          <button
-            onClick={startListening}
-            className="flex items-center justify-center rounded-xl transition-all duration-200 flex-shrink-0"
-            style={{
-              width: 40,
-              height: 40,
-              background: isListening ? "rgba(239,68,68,0.2)" : "rgba(59,130,246,0.1)",
-              border: `1px solid ${isListening ? "rgba(239,68,68,0.4)" : "rgba(59,130,246,0.2)"}`,
-              color: isListening ? "#f87171" : "#60a5fa",
-            }}
-            title="Голосовой ввод"
-          >
-            {isListening ? (
-              <span className="relative flex items-center justify-center">
-                <span className="animate-ripple absolute inline-flex h-full w-full rounded-full" style={{ background: "rgba(239,68,68,0.3)" }} />
-                <Icon name="MicOff" size={16} />
-              </span>
-            ) : (
-              <Icon name="Mic" size={16} />
-            )}
-          </button>
-
-          {/* Textarea */}
           <textarea
             ref={textareaRef}
             value={input}
             onChange={handleTextareaChange}
             onKeyDown={handleKeyDown}
-            placeholder="Напишите сообщение... (Enter — отправить)"
+            placeholder="Написать сообщение... (Enter — отправить)"
             rows={1}
-            className="input-chat flex-1"
-            style={{ border: "none", background: "transparent", padding: "8px 4px", minHeight: 40, boxShadow: "none" }}
-          />
-
-          {/* Send button */}
-          <button
-            onClick={() => sendMessage(input)}
-            disabled={!input.trim()}
-            className="flex items-center justify-center rounded-xl transition-all duration-200 flex-shrink-0 font-semibold text-sm gap-2"
+            className="flex-1 outline-none resize-none bg-transparent text-sm"
             style={{
-              minWidth: 100,
-              height: 40,
-              background: input.trim() ? "linear-gradient(135deg, #2563eb, #1d4ed8)" : "hsl(220, 25%, 12%)",
-              color: input.trim() ? "white" : "hsl(215, 20%, 40%)",
-              cursor: input.trim() ? "pointer" : "not-allowed",
-              boxShadow: input.trim() ? "0 4px 15px rgba(37,99,235,0.35)" : "none",
+              color: "hsl(210,40%,95%)",
+              fontFamily: "'Golos Text', sans-serif",
+              lineHeight: 1.6,
+              maxHeight: "160px",
+              paddingTop: "2px",
             }}
-          >
-            <Icon name="Send" size={15} />
-            Спросить
-          </button>
+          />
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Voice button */}
+            <button
+              onClick={startListening}
+              className="flex items-center justify-center rounded-xl transition-all duration-200"
+              style={{
+                width: 36,
+                height: 36,
+                background: isListening
+                  ? "rgba(239,68,68,0.15)"
+                  : "rgba(79,142,247,0.08)",
+                border: `1px solid ${isListening ? "rgba(239,68,68,0.3)" : "rgba(79,142,247,0.15)"}`,
+                color: isListening ? "#ef4444" : "#4f8ef7",
+              }}
+              title="Голосовой ввод"
+            >
+              <Icon name={isListening ? "MicOff" : "Mic"} size={15} />
+            </button>
+
+            {/* Send button */}
+            <button
+              onClick={() => sendMessage(input)}
+              disabled={!input.trim() || isTyping}
+              className="flex items-center justify-center rounded-xl transition-all duration-200"
+              style={{
+                width: 36,
+                height: 36,
+                background:
+                  input.trim() && !isTyping
+                    ? "linear-gradient(135deg, #2563eb, #4f8ef7)"
+                    : "rgba(79,142,247,0.08)",
+                border: `1px solid ${input.trim() && !isTyping ? "transparent" : "rgba(79,142,247,0.12)"}`,
+                color: input.trim() && !isTyping ? "white" : "hsl(215,20%,35%)",
+                boxShadow: input.trim() && !isTyping ? "0 4px 14px rgba(37,99,235,0.4)" : "none",
+                cursor: !input.trim() || isTyping ? "not-allowed" : "pointer",
+              }}
+              title="Отправить"
+            >
+              <Icon name="ArrowUp" size={16} />
+            </button>
+          </div>
         </div>
-        <p className="text-center text-xs mt-2" style={{ color: "hsl(215, 20%, 35%)" }}>
-          Shift+Enter — новая строка · Enter — отправить
+
+        <p
+          className="text-center mt-2.5 text-xs"
+          style={{ color: "hsl(215, 20%, 30%)", fontFamily: "Golos Text, sans-serif" }}
+        >
+          ИИ может ошибаться. Проверяйте важную информацию.
         </p>
       </div>
     </div>

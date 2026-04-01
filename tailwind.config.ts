@@ -64,6 +64,11 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			fontFamily: {
+				'unbounded': ['Unbounded', 'sans-serif'],
+				'golos': ['Golos Text', 'sans-serif'],
+				'mono-ibm': ['IBM Plex Mono', 'monospace'],
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
@@ -89,7 +94,14 @@ export default {
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fadeIn 0.35s ease-out forwards',
+				'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+				'scale-in': 'scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+				'float': 'float 6s ease-in-out infinite',
+				'spin-slow': 'spinSlow 12s linear infinite',
+				'pulse-ring': 'pulseRing 2s ease-in-out infinite',
+				'orbit': 'orbit 8s linear infinite',
 			}
 		}
 	},
