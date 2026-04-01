@@ -8,13 +8,7 @@ interface Message {
   time: string;
 }
 
-const AI_RESPONSES = [
-  "Это отличный вопрос! Нейросети — это математические модели, вдохновлённые работой человеческого мозга. Они состоят из слоёв нейронов, которые обрабатывают информацию и находят закономерности в данных.",
-  "Я здесь, чтобы помочь вам! Могу отвечать на вопросы, писать тексты, объяснять сложные темы простыми словами, помогать с кодом и многим другим.",
-  "Интересная мысль! Искусственный интеллект развивается стремительно. Каждый год появляются новые архитектуры и возможности, которые открывают новые горизонты для человечества.",
-  "Понимаю вас. Давайте разберём это подробнее. Я готов уделить столько времени, сколько вам нужно, чтобы ответить на ваш вопрос максимально полно и понятно.",
-  "Отличная идея! Вот несколько соображений: во-первых, важно учитывать контекст. Во-вторых, стоит рассмотреть разные точки зрения. Это поможет принять взвешенное решение.",
-];
+const CHAT_API_URL = "https://functions.poehali.dev/2aba1f43-103d-458b-a236-4fd59d7d96c5";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
@@ -41,19 +35,53 @@ export default function ChatPage() {
     new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
 
   const sendMessage = async (text: string) => {
-    if (!text.trim()) return;
+    if (!text.trim() || isTyping) return;
     const userMsg: Message = { id: Date.now().toString(), role: "user", text, time: getTime() };
+
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     if (textareaRef.current) textareaRef.current.style.height = "auto";
 
     setIsTyping(true);
-    await new Promise((r) => setTimeout(r, 1200 + Math.random() * 800));
 
-    const aiText = AI_RESPONSES[Math.floor(Math.random() * AI_RESPONSES.length)];
-    const aiMsg: Message = { id: (Date.now() + 1).toString(), role: "ai", text: aiText, time: getTime() };
-    setIsTyping(false);
-    setMessages((prev) => [...prev, aiMsg]);
+    try {
+      // Build conversation history for context (last 20 messages, excluding welcome)
+      const history = [...messages, userMsg]
+        .filter((m) => m.id !== "welcome" && m.id !== "welcome-new")
+        .slice(-20)
+        .map((m) => ({ role: m.role === "ai" ? "assistant" : "user", content: m.text }));
+
+      const response = await fetch(CHAT_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        throw new Error(data.error || "Ошибка сервера");
+      }
+
+      const aiMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "ai",
+        text: data.reply,
+        time: getTime(),
+      };
+      setMessages((prev) => [...prev, aiMsg]);
+    } catch (err: unknown) {
+      const errorText = err instanceof Error ? err.message : "Неизвестная ошибка";
+      const errMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "ai",
+        text: `⚠️ Ошибка подключения к ИИ: ${errorText}`,
+        time: getTime(),
+      };
+      setMessages((prev) => [...prev, errMsg]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -166,7 +194,7 @@ export default function ChatPage() {
                 style={{ background: "#22c55e", boxShadow: "0 0 4px #22c55e" }}
               />
               <p className="text-xs" style={{ color: "#22c55e" }}>
-                Онлайн · GPT-4
+                Онлайн · GPT-4o mini
               </p>
             </div>
           </div>
