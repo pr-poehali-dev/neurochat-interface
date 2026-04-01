@@ -8,7 +8,11 @@ interface Message {
   time: string;
 }
 
-const CHAT_API_URL = "https://functions.poehali.dev/2aba1f43-103d-458b-a236-4fd59d7d96c5";
+const DEFAULT_CHAT_API_URL = "https://functions.poehali.dev/2aba1f43-103d-458b-a236-4fd59d7d96c5";
+
+function getChatApiUrl(): string {
+  return localStorage.getItem("chat_api_url") || DEFAULT_CHAT_API_URL;
+}
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
@@ -51,7 +55,7 @@ export default function ChatPage() {
         .slice(-20)
         .map((m) => ({ role: m.role === "ai" ? "assistant" : "user", content: m.text }));
 
-      const response = await fetch(CHAT_API_URL, {
+      const response = await fetch(getChatApiUrl(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: history }),

@@ -1,12 +1,16 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
 
+const DEFAULT_API_URL = "https://functions.poehali.dev/2aba1f43-103d-458b-a236-4fd59d7d96c5";
+
 export default function SettingsPage() {
   const [voice, setVoice] = useState(true);
   const [autoSpeak, setAutoSpeak] = useState(false);
   const [soundFx, setSoundFx] = useState(true);
   const [language, setLanguage] = useState("ru");
   const [speed, setSpeed] = useState("normal");
+  const [apiUrl, setApiUrl] = useState(localStorage.getItem("chat_api_url") || "");
+  const [apiSaved, setApiSaved] = useState(false);
 
   const Toggle = ({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) => (
     <button
@@ -110,6 +114,74 @@ export default function SettingsPage() {
               </select>
             }
           />
+        </Section>
+
+        <Section title="Подключение к серверу">
+          <div style={{ background: "hsl(220, 28%, 8%)", borderBottom: "1px solid hsl(220, 25%, 11%)", padding: "16px 20px" }}>
+            <div className="flex items-center gap-3 mb-3">
+              <div
+                className="flex items-center justify-center rounded-lg flex-shrink-0"
+                style={{ width: 34, height: 34, background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.15)" }}
+              >
+                <Icon name="Server" size={16} style={{ color: "#60a5fa" }} />
+              </div>
+              <div>
+                <p className="text-sm font-medium" style={{ color: "hsl(210,40%,92%)" }}>URL сервера API</p>
+                <p className="text-xs" style={{ color: "hsl(215, 20%, 48%)" }}>Укажите адрес вашего сервера или оставьте пустым для использования по умолчанию</p>
+              </div>
+            </div>
+            <div className="flex gap-2 mt-1">
+              <input
+                type="text"
+                value={apiUrl}
+                onChange={(e) => { setApiUrl(e.target.value); setApiSaved(false); }}
+                placeholder={DEFAULT_API_URL}
+                className="flex-1 rounded-xl px-4 py-2.5 text-sm outline-none transition-all duration-200"
+                style={{
+                  background: "hsl(220, 25%, 6%)",
+                  border: "1px solid hsl(220, 25%, 16%)",
+                  color: "hsl(210,40%,90%)",
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: "12px",
+                }}
+                onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = "rgba(79,142,247,0.5)"; }}
+                onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = "hsl(220, 25%, 16%)"; }}
+              />
+              <button
+                onClick={() => {
+                  const trimmed = apiUrl.trim();
+                  if (trimmed) {
+                    localStorage.setItem("chat_api_url", trimmed);
+                  } else {
+                    localStorage.removeItem("chat_api_url");
+                  }
+                  setApiSaved(true);
+                  setTimeout(() => setApiSaved(false), 2000);
+                }}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex-shrink-0"
+                style={{
+                  background: apiSaved ? "rgba(34,197,94,0.15)" : "rgba(59,130,246,0.15)",
+                  border: apiSaved ? "1px solid rgba(34,197,94,0.3)" : "1px solid rgba(59,130,246,0.3)",
+                  color: apiSaved ? "#4ade80" : "#60a5fa",
+                }}
+              >
+                <Icon name={apiSaved ? "Check" : "Save"} size={14} />
+                {apiSaved ? "Сохранено" : "Сохранить"}
+              </button>
+            </div>
+            {apiUrl.trim() && (
+              <button
+                onClick={() => { setApiUrl(""); localStorage.removeItem("chat_api_url"); setApiSaved(false); }}
+                className="mt-2 text-xs flex items-center gap-1 transition-all duration-200"
+                style={{ color: "hsl(215, 20%, 45%)" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#f87171"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "hsl(215, 20%, 45%)"; }}
+              >
+                <Icon name="X" size={11} />
+                Сбросить к серверу по умолчанию
+              </button>
+            )}
+          </div>
         </Section>
 
         <Section title="Данные">
