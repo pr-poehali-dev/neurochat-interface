@@ -29,12 +29,18 @@ def convert_messages_to_gemini(messages):
 
 
 def handler(request, context=None):
+    # request is a dict with keys: method, headers, body, queryStringParameters, etc.
+    method = request.get("method", "POST") if isinstance(request, dict) else request.method
+
     # Handle CORS preflight
-    if request.method == "OPTIONS":
+    if method == "OPTIONS":
         return {"statusCode": 200, "headers": CORS_HEADERS, "body": "ok"}
 
     try:
-        body = json.loads(request.body)
+        raw_body = request.get("body", "{}") if isinstance(request, dict) else request.body
+        if not raw_body:
+            raw_body = "{}"
+        body = json.loads(raw_body)
         messages = body.get("messages", [])
 
         api_key = os.environ.get("GOOGLE_API_KEY")
