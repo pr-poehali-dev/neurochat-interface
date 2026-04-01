@@ -1,14 +1,16 @@
-[
-  {
-    "name": "Test chat message",
-    "method": "POST",
-    "body": {
-      "messages": [
-        { "role": "user", "content": "Привет! Как тебя зовут?" }
-      ]
-    },
-    "expect": {
-      "status": 200
+{
+  "tests": [
+    {
+      "name": "Test chat message",
+      "method": "POST",
+      "body": {
+        "messages": [
+          { "role": "user", "content": "Привет! Как тебя зовут?" }
+        ]
+      },
+      "expect": {
+        "status": 200
+      }
     }
-  }
-]
+  ]
+}
